@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState, useMemo } from "react"
-import { motion, useAnimation } from "framer-motion"
+import { motion } from "framer-motion"
 import { ArrowRight, CheckCircle } from "lucide-react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { OrbitControls, Text } from "@react-three/drei"
