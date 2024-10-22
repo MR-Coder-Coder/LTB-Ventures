@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useMemo } from "react"
 import { motion, useAnimation } from "framer-motion"
 import { ArrowRight, CheckCircle } from "lucide-react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
-import { OrbitControls, Text, LineSegments } from "@react-three/drei"
+import { OrbitControls, Text } from "@react-three/drei"
 import * as THREE from "three"
 import Image from 'next/image'
 
@@ -21,7 +21,7 @@ function Node({ position, color, label, onClick, isCenter = false }) {
   const mesh = useRef()
   const [hovered, setHovered] = useState(false)
 
-  useFrame((state) => {
+  useFrame(() => {
     mesh.current.rotation.x = mesh.current.rotation.y += 0.01
   })
 
@@ -109,7 +109,6 @@ function NodeGraph({ onNodeClick }) {
 }
 
 export function LtbVentureHomeDark() {
-  const controls = useAnimation()
   const [activeSection, setActiveSection] = useState(0)
   const [clickedSection, setClickedSection] = useState(null)
   const sectionRefs = useRef([])
