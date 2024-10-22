@@ -7,6 +7,8 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { OrbitControls, Text } from "@react-three/drei"
 import * as THREE from "three"
 import Image from 'next/image'
+import { Vector3 } from 'three'
+import { LineSegments, BufferGeometry, LineBasicMaterial } from 'three'
 
 const sections = [
   { title: "Law", description: "Expert legal counsel for businesses", media: "/Law.mp4" },
@@ -17,12 +19,23 @@ const sections = [
   { title: "Coding", description: "Custom software development and programming", media: "/Coding.mp4" },
 ]
 
-function Node({ position, color, label, onClick, isCenter = false }) {
-  const mesh = useRef()
+interface NodeProps {
+  position: Vector3
+  color: string
+  label: string
+  onClick: () => void
+  isCenter?: boolean
+}
+
+function Node({ position, color, label, onClick, isCenter = false }: NodeProps) {
+  const mesh = useRef<THREE.Mesh>(null)
   const [hovered, setHovered] = useState(false)
 
   useFrame(() => {
-    mesh.current.rotation.x = mesh.current.rotation.y += 0.01
+    if (mesh.current) {
+      mesh.current.rotation.x += 0.01
+      mesh.current.rotation.y += 0.01
+    }
   })
 
   return (
@@ -50,9 +63,9 @@ function Node({ position, color, label, onClick, isCenter = false }) {
   )
 }
 
-function NodeGraph({ onNodeClick }) {
+function NodeGraph({ onNodeClick }: { onNodeClick: (index: number) => void }) {
   const { camera } = useThree()
-  const linesRef = useRef()
+  const linesRef = useRef<LineSegments<BufferGeometry, LineBasicMaterial>>(null)
 
   useEffect(() => {
     camera.position.z = 5
@@ -89,7 +102,13 @@ function NodeGraph({ onNodeClick }) {
     <>
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
-      <Node position={nodePositions[0]} color="#bd93f9" label="LTB Ventures" isCenter={true} />
+      <Node 
+        position={nodePositions[0]} 
+        color="#bd93f9" 
+        label="LTB Ventures" 
+        isCenter={true} 
+        onClick={() => {}} // Add this line
+      />
       {sections.map((section, i) => (
         <Node
           key={section.title}
@@ -110,9 +129,9 @@ function NodeGraph({ onNodeClick }) {
 
 export function LtbVentureHomeDark() {
   const [activeSection, setActiveSection] = useState(0)
-  const [clickedSection, setClickedSection] = useState(null)
-  const sectionRefs = useRef([])
-  const threeJsSectionRef = useRef(null)
+  const [clickedSection, setClickedSection] = useState<number | null>(null)
+  const sectionRefs = useRef<(HTMLElement | null)[]>([])
+  const threeJsSectionRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -127,10 +146,10 @@ export function LtbVentureHomeDark() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const scrollToSection = (index) => {
+  const scrollToSection = (index: number) => {
     if (sectionRefs.current[index]) {
-      setClickedSection(index + 1) // Set clickedSection when a node is clicked
-      sectionRefs.current[index].scrollIntoView({ behavior: "smooth" })
+      setClickedSection(index + 1)
+      sectionRefs.current[index]?.scrollIntoView({ behavior: "smooth" })
     }
   }
 
@@ -170,7 +189,7 @@ export function LtbVentureHomeDark() {
       {sections.map((section, index) => (
       <motion.section
         key={section.title}
-        ref={(el) => (sectionRefs.current[index] = el)}
+        ref={(el: HTMLElement | null) => { sectionRefs.current[index] = el }}
         className="min-h-screen flex items-center justify-center p-8 bg-gray-800"
         initial={{ opacity: 0 }}
         animate={
