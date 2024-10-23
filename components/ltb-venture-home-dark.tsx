@@ -206,8 +206,16 @@ export function LtbVentureHomeDark() {
       {/* Interactive Node Edge Graph */}
       <section ref={threeJsSectionRef} className="h-screen bg-gray-900 p-8">
         <h2 className="text-3xl font-bold mb-8 text-center text-purple-300">Our Expertise Network</h2>
-        <div className="w-full h-[calc(100vh-8rem)]">
-          <Canvas>
+        <div className="w-full h-[calc(100vh-8rem)] relative">
+          {/* Background indicator for interactive area */}
+          <div className="absolute inset-0 bg-gray-800 bg-opacity-50 rounded-lg border-2 border-purple-500 border-opacity-50"></div>
+          
+          {/* Instruction text */}
+          <div className="absolute top-4 left-4 text-purple-300 text-sm">
+          </div>
+          
+          {/* Three.js Canvas */}
+          <Canvas className="absolute inset-0">
             <NodeGraph onNodeClick={scrollToSection} />
           </Canvas>
         </div>
