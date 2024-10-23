@@ -4,11 +4,12 @@ import { useEffect, useRef, useState, useMemo } from "react"
 import { motion } from "framer-motion"
 import { ArrowRight, CheckCircle } from "lucide-react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
-import { OrbitControls, Text } from "@react-three/drei"
+import { OrbitControls, Text, Billboard } from "@react-three/drei"
 import * as THREE from "three"
 import Image from 'next/image'
 import { Vector3 } from 'three'
 import { LineSegments, BufferGeometry, LineBasicMaterial } from 'three'
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 
 const sections = [
   { title: "Law", description: "Expert legal counsel for businesses", media: "/Law.mp4" },
@@ -50,15 +51,22 @@ function Node({ position, color, label, onClick, isCenter = false }: NodeProps) 
         <sphereGeometry args={[isCenter ? 0.2 : 0.15, 32, 32]} />
         <meshStandardMaterial color={hovered ? "#ff79c6" : color} />
       </mesh>
-      <Text
-        position={[0, isCenter ? -0.3 : -0.2, 0]}
-        fontSize={isCenter ? 0.1 : 0.08}
-        color="#f8f8f2"
-        anchorX="center"
-        anchorY="middle"
+      <Billboard
+        follow={true}
+        lockX={false}
+        lockY={false}
+        lockZ={false}
       >
-        {label}
-      </Text>
+        <Text
+          position={[0, isCenter ? -0.3 : -0.2, 0]}
+          fontSize={isCenter ? 0.1 : 0.08}
+          color="#f8f8f2"
+          anchorX="center"
+          anchorY="middle"
+        >
+          {label}
+        </Text>
+      </Billboard>
     </group>
   )
 }
@@ -66,10 +74,18 @@ function Node({ position, color, label, onClick, isCenter = false }: NodeProps) 
 function NodeGraph({ onNodeClick }: { onNodeClick: (index: number) => void }) {
   const { camera } = useThree()
   const linesRef = useRef<LineSegments<BufferGeometry, LineBasicMaterial>>(null)
+  const controlsRef = useRef<OrbitControlsImpl>(null)
 
   useEffect(() => {
     camera.position.z = 5
   }, [camera])
+
+  useEffect(() => {
+    if (controlsRef.current) {
+      controlsRef.current.minDistance = 3
+      controlsRef.current.maxDistance = 10
+    }
+  }, [])
 
   const nodePositions = useMemo(() => {
     const centerPosition = new THREE.Vector3(0, 0, 0)
@@ -107,7 +123,7 @@ function NodeGraph({ onNodeClick }: { onNodeClick: (index: number) => void }) {
         color="#bd93f9" 
         label="LTB Ventures" 
         isCenter={true} 
-        onClick={() => {}} // Add this line
+        onClick={() => {}}
       />
       {sections.map((section, i) => (
         <Node
@@ -122,7 +138,12 @@ function NodeGraph({ onNodeClick }: { onNodeClick: (index: number) => void }) {
         <bufferGeometry />
         <lineBasicMaterial color="#6272a4" linewidth={1} />
       </lineSegments>
-      <OrbitControls enablePan={false} enableZoom={false} />
+      <OrbitControls 
+        ref={controlsRef}
+        enablePan={false} 
+        enableZoom={true} 
+        zoomSpeed={0.5}
+      />
     </>
   )
 }
@@ -164,6 +185,13 @@ export function LtbVentureHomeDark() {
       {/* Hero Section */}
       <section className="h-screen flex items-center justify-center bg-gradient-to-r from-purple-900 to-indigo-900 text-white">
         <div className="text-center">
+          <Image
+            src="/logo.png"  // Update this path to the correct location of your logo file
+            alt="LTB Venture Logo"
+            width={200}  // Adjust the width as needed
+            height={100}  // Adjust the height as needed
+            className="mx-auto mb-6"  // This centers the image and adds some margin below
+          />
           <h1 className="text-5xl font-bold mb-4">LTB Venture</h1>
           <p className="text-xl mb-8">Innovative Management Consultancy</p>
           <button 
