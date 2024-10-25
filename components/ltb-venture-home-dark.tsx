@@ -12,8 +12,8 @@ import { LineSegments, BufferGeometry, LineBasicMaterial } from 'three'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 
 const sections = [
-  { title: "Law", description: "Expert legal counsel for businesses", media: "/Law.mp4" },
-  { title: "Accounting", description: "Precise financial management and reporting", media: "/Accounting.jpg" },
+  { title: "Workflow Automation", description: "Streamline processes with cutting-edge automation solutions", media: "/Law.mp4" },
+  { title: "Forensic Investigation", description: "In-depth investigative services for uncovering critical insights", media: "/Accounting.jpg" },  
   { title: "Problem Solving", description: "Innovative solutions to complex challenges", media: "/ProblemSolving.jpg" },
   { title: "Management", description: "Effective leadership and organizational strategies", media: "/Management.mp4" },
   { title: "Web Development", description: "Cutting-edge web solutions for modern businesses", media: "/WebDevelopment.jpg" },
@@ -71,48 +71,72 @@ function Node({ position, color, label, onClick, isCenter = false }: NodeProps) 
   )
 }
 
-function NodeGraph({ onNodeClick }: { onNodeClick: (index: number) => void }) {
-  const { camera } = useThree()
-  const linesRef = useRef<LineSegments<BufferGeometry, LineBasicMaterial>>(null)
-  const controlsRef = useRef<OrbitControlsImpl>(null)
+function NodeGraph({ sections, onNodeClick }: { sections: Array<{ title: string }>, onNodeClick: (index: number) => void }) {
+  const { camera } = useThree();
+  const linesRef = useRef<LineSegments<BufferGeometry, LineBasicMaterial>>(null);
+  const controlsRef = useRef<OrbitControlsImpl>(null);
+  const pointRefs = useRef<THREE.Mesh[]>([]);  // Array of refs for multiple particles
+
+  const travelSpeed = 0.5;  // Increased speed for quicker particle movement
 
   useEffect(() => {
-    camera.position.z = 5
-  }, [camera])
+    camera.position.z = 5; // Set the initial camera position
+  }, [camera]);
 
   useEffect(() => {
     if (controlsRef.current) {
-      controlsRef.current.minDistance = 3
-      controlsRef.current.maxDistance = 10
+      controlsRef.current.minDistance = 1; // Allow zooming in closer
+      controlsRef.current.maxDistance = 20; // Allow zooming out further
     }
-  }, [])
+  }, []);
 
   const nodePositions = useMemo(() => {
-    const centerPosition = new THREE.Vector3(0, 0, 0)
+    const centerPosition = new THREE.Vector3(0, 0, 0);
     const otherPositions = sections.map(() => {
       return new THREE.Vector3(
         (Math.random() - 0.5) * 4,  // x between -2 and 2
         (Math.random() - 0.5) * 4,  // y between -2 and 2
         (Math.random() - 0.5) * 2   // z between -1 and 1
-      )
-    })
-    return [centerPosition, ...otherPositions]
-  }, [])
+      );
+    });
+    return [centerPosition, ...otherPositions];
+  }, [sections]);
+
+  useFrame(({ clock }) => {
+    const elapsedTime = clock.getElapsedTime(); // Get the elapsed time since the component was mounted
+
+    const radius = 3; // Set the radius of the circular path
+
+    // Rotate the camera around the center of the graph (anti-clockwise)
+    camera.position.x = radius * Math.cos(elapsedTime * 0.1);  // Slow rotation
+    camera.position.y = radius * Math.sin(elapsedTime * 0.1);
+    camera.lookAt(0, 0, 0);  // Ensure camera is always looking at the center
+
+    // Animate particles for each node (except the center node)
+    nodePositions.slice(1).forEach((targetPosition, i) => {
+      const startPosition = nodePositions[0];  // Always from the center node
+      const lerpFactor = (Math.sin(elapsedTime * travelSpeed + i * Math.PI / sections.length) + 1) / 2;  // Vary the phase for each particle
+
+      if (pointRefs.current[i]) {
+        pointRefs.current[i].position.lerpVectors(startPosition, targetPosition, lerpFactor);  // Interpolate position for each particle
+      }
+    });
+  });
 
   useFrame(() => {
     if (linesRef.current) {
-      const positions = []
-      
+      const positions = [];
+
       // Connect center to all other nodes
       for (let i = 1; i < nodePositions.length; i++) {
-        positions.push(nodePositions[0].x, nodePositions[0].y, nodePositions[0].z)
-        positions.push(nodePositions[i].x, nodePositions[i].y, nodePositions[i].z)
+        positions.push(nodePositions[0].x, nodePositions[0].y, nodePositions[0].z);
+        positions.push(nodePositions[i].x, nodePositions[i].y, nodePositions[i].z);
       }
 
-      linesRef.current.geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
-      linesRef.current.geometry.attributes.position.needsUpdate = true
+      linesRef.current.geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      linesRef.current.geometry.attributes.position.needsUpdate = true;
     }
-  })
+  });
 
   return (
     <>
@@ -134,19 +158,45 @@ function NodeGraph({ onNodeClick }: { onNodeClick: (index: number) => void }) {
           onClick={() => onNodeClick(i)}
         />
       ))}
+
+      {/* Small traveling points for each edge */}
+      {sections.map((section, i) => (
+        <mesh
+          ref={(el: THREE.Mesh | null) => {
+            pointRefs.current[i] = el as THREE.Mesh;  // Explicitly assert the type
+          }}
+          key={section.title}
+          position={nodePositions[0]}
+        >
+          <sphereGeometry args={[0.03, 32, 32]} />  {/* Smaller sphere size */}
+          <meshStandardMaterial color="#6272a4" />  {/* Same color as edges */}
+        </mesh>
+      ))}
+
+
       <lineSegments ref={linesRef}>
         <bufferGeometry />
         <lineBasicMaterial color="#6272a4" linewidth={1} />
       </lineSegments>
-      <OrbitControls 
+      <OrbitControls
         ref={controlsRef}
-        enablePan={false} 
-        enableZoom={true} 
-        zoomSpeed={0.5}
+        enablePan={false}  // Disable panning
+        enableZoom={true}  // Allow zooming
+        zoomSpeed={0.5}    // Set the zoom speed
+        rotateSpeed={1.0}  // Adjust rotation speed if needed
+        mouseButtons={{
+          LEFT: THREE.MOUSE.ROTATE,   // Left-click to rotate
+          MIDDLE: THREE.MOUSE.DOLLY,  // Middle mouse button to zoom
+          RIGHT: THREE.MOUSE.PAN,     // Right-click to pan
+        }}
+        // Make sure damping is enabled for smoother experience
+        enableDamping={true}
+        dampingFactor={0.1}  // Adjust for smoother motion
       />
     </>
-  )
+  );
 }
+
 
 export function LtbVentureHomeDark() {
   const [activeSection, setActiveSection] = useState(0)
@@ -192,7 +242,7 @@ export function LtbVentureHomeDark() {
             height={100}  // Adjust the height as needed
             className="mx-auto mb-6"  // This centers the image and adds some margin below
           />
-          <h1 className="text-5xl font-bold mb-4">LTB Venture</h1>
+          <h1 className="text-5xl font-bold mb-4">LTB Ventures</h1>
           <p className="text-xl mb-8">Innovative Management Consultancy</p>
           <button 
             className="bg-purple-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-purple-600 transition duration-300"
@@ -216,7 +266,7 @@ export function LtbVentureHomeDark() {
           
           {/* Three.js Canvas */}
           <Canvas className="absolute inset-0">
-            <NodeGraph onNodeClick={scrollToSection} />
+            <NodeGraph sections={sections} onNodeClick={scrollToSection} />
           </Canvas>
         </div>
       </section>
