@@ -163,13 +163,13 @@ function NodeGraph({ sections, onNodeClick }: { sections: Array<{ title: string 
       {sections.map((section, i) => (
         <mesh
           ref={(el: THREE.Mesh | null) => {
-            pointRefs.current[i] = el as THREE.Mesh;  // Explicitly assert the type
+            pointRefs.current[i] = el as THREE.Mesh;
           }}
           key={section.title}
           position={nodePositions[0]}
         >
           <sphereGeometry args={[0.03, 32, 32]} />  {/* Smaller sphere size */}
-          <meshStandardMaterial color="#6272a4" />  {/* Same color as edges */}
+          <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.5} />  {/* Changed to white */}
         </mesh>
       ))}
 
