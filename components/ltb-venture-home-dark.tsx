@@ -13,7 +13,7 @@ import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 
 const sections = [
   { title: "Workflow Automation", description: "Streamline processes with cutting-edge automation solutions", media: "/Law.mp4" },
-  { title: "Forensic Investigation", description: "In-depth investigative services for uncovering critical insights", media: "/Accounting.jpg" },  
+  { title: "Forensic Investigation", description: "In-depth investigative services for uncovering critical insights", media: "/Accounting.jpg" },
   { title: "Problem Solving", description: "Innovative solutions to complex challenges", media: "/ProblemSolving.jpg" },
   { title: "Management", description: "Effective leadership and organizational strategies", media: "/Management.mp4" },
   { title: "Web Development", description: "Cutting-edge web solutions for modern businesses", media: "/WebDevelopment.jpg" },
@@ -142,12 +142,12 @@ function NodeGraph({ sections, onNodeClick }: { sections: Array<{ title: string 
     <>
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
-      <Node 
-        position={nodePositions[0]} 
-        color="#bd93f9" 
-        label="LTB Ventures" 
-        isCenter={true} 
-        onClick={() => {}}
+      <Node
+        position={nodePositions[0]}
+        color="#bd93f9"
+        label="LTB Ventures"
+        isCenter={true}
+        onClick={() => { }}
       />
       {sections.map((section, i) => (
         <Node
@@ -244,7 +244,7 @@ export function LtbVentureHomeDark() {
           />
           <h1 className="text-5xl font-bold mb-4">LTB Ventures</h1>
           <p className="text-xl mb-8">Innovative Management Consultancy</p>
-          <button 
+          <button
             className="bg-purple-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-purple-600 transition duration-300"
             onClick={scrollToThreeJs}
           >
@@ -259,11 +259,11 @@ export function LtbVentureHomeDark() {
         <div className="w-full h-[calc(100vh-8rem)] relative">
           {/* Background indicator for interactive area */}
           <div className="absolute inset-0 bg-gray-800 bg-opacity-50 rounded-lg border-2 border-purple-500 border-opacity-50"></div>
-          
+
           {/* Instruction text */}
           <div className="absolute top-4 left-4 text-purple-300 text-sm">
           </div>
-          
+
           {/* Three.js Canvas */}
           <Canvas className="absolute inset-0">
             <NodeGraph sections={sections} onNodeClick={scrollToSection} />
@@ -273,78 +273,97 @@ export function LtbVentureHomeDark() {
 
       {/* Specialization Sections */}
       {sections.map((section, index) => (
-      <motion.section
-        key={section.title}
-        ref={(el: HTMLElement | null) => { sectionRefs.current[index] = el }}
-        className="min-h-screen flex items-center justify-center p-8 bg-gray-800"
-        initial={{ opacity: 0 }}
-        animate={
-          (activeSection >= index + 1 && clickedSection === null) || 
-          clickedSection === index + 1 
-            ? { opacity: 1 } 
-            : { opacity: 0 }
-        }
-        transition={{
-          duration: 0.5,
-        }}
-        style={{
-          pointerEvents: 
-            (activeSection >= index + 1 && clickedSection === null) || 
-            clickedSection === index + 1 
-              ? 'auto' 
-              : 'none',
-        }}
-      >
-        <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center">
-          <div className="md:w-1/2 mb-8 md:mb-0">
-            <h2 className="text-3xl font-bold mb-4 text-purple-300">{section.title}</h2>
-            <p className="text-lg mb-4 text-gray-300">{section.description}</p>
-            <ul className="space-y-2 text-gray-300">
-              <li className="flex items-center">
-                <CheckCircle className="text-green-400 mr-2" />
-                <span>Expert consultancy</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="text-green-400 mr-2" />
-                <span>Tailored solutions</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="text-green-400 mr-2" />
-                <span>Proven track record</span>
-              </li>
-            </ul>
-            <button 
-              className="mt-6 bg-purple-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-purple-600 transition duration-300 flex items-center"
-              onClick={scrollToThreeJs}
-            >
-              Home <ArrowRight className="ml-2" />
-            </button>
-          </div>
-          <div className="md:w-1/2">
-            {section.media.endsWith('.mp4') ? (
-              <video 
-                className="w-full h-64 rounded-lg object-cover"
-                autoPlay 
-                loop 
-                muted 
-                playsInline
+        <motion.section
+          key={section.title}
+          ref={(el: HTMLElement | null) => { sectionRefs.current[index] = el }}
+          className="min-h-screen flex items-center justify-center p-8 bg-gray-800"
+          initial={{ opacity: 0 }}
+          animate={
+            (activeSection >= index + 1 && clickedSection === null) ||
+              clickedSection === index + 1
+              ? { opacity: 1 }
+              : { opacity: 0 }
+          }
+          transition={{
+            duration: 0.5,
+          }}
+          style={{
+            pointerEvents:
+              (activeSection >= index + 1 && clickedSection === null) ||
+                clickedSection === index + 1
+                ? 'auto'
+                : 'none',
+          }}
+        >
+          <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center">
+            <div className="md:w-1/2 mb-8 md:mb-0">
+              <h2 className="text-3xl font-bold mb-4 text-purple-300">{section.title}</h2>
+              <p className="text-lg mb-4 text-gray-300">{section.description}</p>
+              <ul className="space-y-2 text-gray-300">
+                <li className="flex items-center">
+                  <CheckCircle className="text-green-400 mr-2" />
+                  <span>Expert consultancy</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="text-green-400 mr-2" />
+                  <span>Tailored solutions</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="text-green-400 mr-2" />
+                  <span>Proven track record</span>
+                </li>
+              </ul>
+              <button
+                className="mt-6 bg-purple-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-purple-600 transition duration-300 flex items-center"
+                onClick={scrollToThreeJs}
               >
-                <source src={section.media} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            ) : (
-              <Image
-                src={section.media}
-                alt={`${section.title} illustration`}
-                width={500}
-                height={300}
-                className="w-full h-64 rounded-lg object-cover"
-              />
-            )}
+                Home <ArrowRight className="ml-2" />
+              </button>
+            </div>
+            <div className="md:w-1/2">
+              {section.media.endsWith('.mp4') ? (
+                <video
+                  className="w-full h-64 rounded-lg object-cover"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                >
+                  <source src={section.media} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              ) : (
+                <Image
+                  src={section.media}
+                  alt={`${section.title} illustration`}
+                  width={500}
+                  height={300}
+                  className="w-full h-64 rounded-lg object-cover"
+                />
+              )}
+            </div>
+          </div>
+        </motion.section>
+      ))}
+
+      {/* Footer */}
+      <footer className="bg-gray-900 py-6 text-center text-gray-600 border-t border-gray-800/50">
+        <div className="max-w-4xl mx-auto px-4 space-y-2">
+          <div className="space-y-1">
+            <h3 className="text-xs font-medium text-gray-500">LTB VENTURES LIMITED</h3>
+            <p className="text-[10px]">Company number: 09181438</p>
+            <p className="text-[10px]">218 Bellegrove Road, Welling, England, DA16 3RT</p>
+          </div>
+
+          <div className="pt-2">
+            <p className="text-[10px]">Contact: <a href="mailto:contact@ltbventures.com" className="hover:text-gray-400 transition-colors">contact@ltbventures.com</a></p>
+          </div>
+
+          <div className="pt-4 text-[10px] text-gray-700">
+            <p>&copy; {new Date().getFullYear()} LTB Ventures. All rights reserved.</p>
           </div>
         </div>
-      </motion.section>
-    ))}
+      </footer>
     </div>
   )
 }
